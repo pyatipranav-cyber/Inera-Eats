@@ -33,6 +33,13 @@ function call(handler, { method = 'POST', body, rawBody, preParsed = false } = {
   });
 }
 
+// Freeze the clock at 1 pm IST so the order tests run at any hour of the day.
+const RealDate = globalThis.Date;
+const FIXED_NOW = new RealDate(RealDate.UTC(2026, 0, 1, 7, 30)).getTime();
+globalThis.Date = class extends RealDate {
+  constructor(...args) { if (args.length) super(...args); else super(FIXED_NOW); }
+  static now() { return FIXED_NOW; }
+};
 const openRestaurant = RESTAURANTS.find((r) => isOpenNow(r));
 const realFetch = globalThis.fetch;
 
